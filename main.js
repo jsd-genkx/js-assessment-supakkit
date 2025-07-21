@@ -12,32 +12,116 @@ const fieldCharacter = "░";
 const pathCharacter = "*";
 
 class Field {
-	constructor(field = [[]]) {
-		this.field = field;
+	#row = 0;
+	#column = 0;
+	#field = [];
 
-		// Replace with your own code //
-		// Set the home position at (0, 0) before the game starts
-		this.positionRow = 0;
-		this.positionCol = 0;
-		this.field[this.positionRow][this.positionCol] = pathCharacter;
+	constructor(row = 8, column = 5) {
+		this.#row = row;
+		this.#column = column;
+		this.#field = [];
+		this.#createField();
+		// this.positionRow = 0;
+		// this.positionCol = 0;
+		// this.field[this.positionRow][this.positionCol] = pathCharacter;
 	}
 
-	// Print field //
+	#createField() {
+		const components = this.#getComponentFieldPerHole(3, 1);
+		const comLen = components.length;
+		
+		for(let i = 0; i < this.#row; i++) {
+			this.#field.push([]);
+			for(let j = 0; j < this.#column; j++) {
+				this.#field[i].push( components[Math.floor( Math.random() * comLen )] );
+			}
+		}
+
+		// ส่วน random ของ "^"
+		const hatRow = Math.floor( Math.random() * this.#row );
+		const hatColumn = Math.floor( Math.random() * this.#column );
+		this.#field[ hatRow ][ hatColumn ] = hat;
+
+		// ส่วน random ของ "*"
+		let actorRow;
+		let actorColumn;
+		do {
+			actorRow = Math.floor( Math.random() * row );
+			actorColumn = Math.floor( Math.random() * column );
+		} while( actorRow === hatRow && actorColumn === hatColumn);
+		field[ actorRow ][ actorColumn ] = "*";
+
+		return field;
+	}
+
+	#getComponentFieldPerHole(numFieldChar, numHole) {
+		let components = [];
+		components.push( 
+			...("░".repeat(numFieldChar)), 
+			...("0".repeat(numHole))
+		);
+		return components;
+	}
+
+
+
+
 	print() {
 		clear();
-
-		// Replace with your own code //
-		console.log(this.field); // Please REMOVE this line before you start your code!
 	}
-
-	// Your Code //
 }
 
-// Game Mode ON
-// Remark: Code example below should be deleted and use your own code.
-const newGame = new Field([
-	["░", "░", "O"],
-	["░", "O", "░"],
-	["░", "^", "░"],
-]);
+const newGame = new Field();
 newGame.print();
+
+
+function createField(row, column) {
+	const components = getComponentFieldPerHole(3, 1);
+	const comLen = components.length;
+	let field = [];
+	
+	for(let i = 0; i < row; i++) {
+		field.push([]);
+	    for(let j = 0; j < column; j++) {
+		    field[i].push( components[Math.floor( Math.random() * comLen )] );
+	   }
+	}
+	// ส่วน random ของ "^"
+	const hatRow = Math.floor( Math.random() * row );
+	const hatColumn = Math.floor( Math.random() * column );
+	field[ hatRow ][ hatColumn ] = "^";
+
+	// ส่วน random ของ "*"
+	let actorRow;
+	let actorColumn;
+	do {
+		actorRow = Math.floor( Math.random() * row );
+		actorColumn = Math.floor( Math.random() * column );
+	} while( actorRow === hatRow && actorColumn === hatColumn);
+	field[ actorRow ][ actorColumn ] = "*";
+
+	return field;
+}
+
+function getComponentFieldPerHole(numFieldChar, numHole) {
+	let components = [];
+	components.push( 
+		...("░".repeat(numFieldChar)), 
+		...("0".repeat(numHole))
+	);
+	return components;
+}
+
+function print(field) {
+	const rowLen = field.length;
+
+	for(let i = 0; i < rowLen; i++) {
+	   console.log(field[i]);
+	}
+}
+
+
+// testing
+print( createField(5, 3) );
+// console.log( getComponentFieldPerHole(3, 2) );
+
