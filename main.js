@@ -14,8 +14,7 @@ const pathCharacter = "*";
 class Field {
 	row = 0;
 	column = 0;
-	numFieldCharRatio = 3;
-	numHoleRatio = 1;
+	holePercentage = 30;
 	field = [];
 	gameActive = true;
 	x = 0;
@@ -64,9 +63,11 @@ class Field {
 
 	getComponentFieldPerHole() {
 		const components = [];
+		const numHoleRatio = Math.floor( this.holePercentage * 0.1 );
+		const numFieldCharRatio = 10 - numHoleRatio;
 		components.push( 
-			...(fieldCharacter.repeat(this.numFieldCharRatio)), 
-			...(hole.repeat(this.numHoleRatio))
+			...(fieldCharacter.repeat(numFieldCharRatio)), 
+			...(hole.repeat(numHoleRatio))
 		);
 		return components;
 	}
@@ -85,19 +86,19 @@ class Field {
 		this.warnBoundingField = false;
 
 		if (this.x < 0 || this.x > this.xMax || this.y < 0 || this.y > this.yMax) {
-			this.exitGame("You moved outside.");
+			this.exitGame("You went out of bounds! Game over.");
 			return;
 		}
 		else if (this.field[this.y][this.x] === hole) {
-			this.exitGame("You fell in a hole.");
+			this.exitGame("You fell into a hole! Game over.");
 			return;
 		}
 		else if (this.field[this.y][this.x] === hat) {
-			this.exitGame("You found your hat.");
+			this.exitGame("You found the hat! You win!");
 			return;
 		}
 		else if ( this.x === 0 || this.x === this.xMax || this.y === 0 || this.y === this.yMax) {
-			this.movingMessage = 'You are in bounding field.';
+			this.movingMessage = 'Be careful not to go out.';
 		}
 
 		this.updatePath();
