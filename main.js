@@ -14,20 +14,19 @@ const pathCharacter = "*";
 class Field {
 	#row = 0;
 	#column = 0;
+	#numFieldCharRatio = 3;
+	#numHoleRatio = 2;
 	#field = [];
 
-	constructor(row = 8, column = 5) {
-		this.#row = row;
-		this.#column = column;
-		this.#field = [];
+	constructor(row, column) {
+		this.#row = row > 0 ? +row : 8;
+		this.#column = column > 0 ? +column : 5;
 		this.#createField();
-		// this.positionRow = 0;
-		// this.positionCol = 0;
-		// this.field[this.positionRow][this.positionCol] = pathCharacter;
+		
 	}
 
 	#createField() {
-		const components = this.#getComponentFieldPerHole(3, 1);
+		const components = this.#getComponentFieldPerHole();
 		const comLen = components.length;
 		
 		for(let i = 0; i < this.#row; i++) {
@@ -46,35 +45,33 @@ class Field {
 		let actorRow;
 		let actorColumn;
 		do {
-			actorRow = Math.floor( Math.random() * row );
-			actorColumn = Math.floor( Math.random() * column );
+			actorRow = Math.floor( Math.random() * this.#row );
+			actorColumn = Math.floor( Math.random() * this.#column );
 		} while( actorRow === hatRow && actorColumn === hatColumn);
-		field[ actorRow ][ actorColumn ] = "*";
-
-		return field;
+		this.#field[ actorRow ][ actorColumn ] = pathCharacter;
 	}
 
-	#getComponentFieldPerHole(numFieldChar, numHole) {
-		let components = [];
+	#getComponentFieldPerHole() {
+		const components = [];
 		components.push( 
-			...("░".repeat(numFieldChar)), 
-			...("0".repeat(numHole))
+			...(fieldCharacter.repeat(this.#numFieldCharRatio)), 
+			...(hole.repeat(this.#numHoleRatio))
 		);
 		return components;
 	}
 
-
-
-
 	print() {
-		clear();
+		// clear();
+		for( let row of this.#field) {
+			console.log( row );
+		}
 	}
 }
 
 const newGame = new Field();
 newGame.print();
 
-
+/*
 function createField(row, column) {
 	const components = getComponentFieldPerHole(3, 1);
 	const comLen = components.length;
@@ -113,10 +110,9 @@ function getComponentFieldPerHole(numFieldChar, numHole) {
 }
 
 function print(field) {
-	const rowLen = field.length;
 
-	for(let i = 0; i < rowLen; i++) {
-	   console.log(field[i]);
+	for( let row of field) {
+		console.log( row );
 	}
 }
 
@@ -124,4 +120,6 @@ function print(field) {
 // testing
 print( createField(5, 3) );
 // console.log( getComponentFieldPerHole(3, 2) );
+*/
+
 

@@ -166,6 +166,7 @@ _- The purpose of this section is not to explain your code but rather to convey 
 	- มีการ print map
 	- เดินได้ถูกต้อง และมีการ update map ตามตำแหน่งที่เดิน
 	- เป็นไปตามกฎของเกม
+  - เมื่ออยู่ที่ขอบ ให้เตือน user ไม่ให้ออกจากขอบ
 
 #### 2) สร้าง field
 - เริ่มที่สร้าง field ก่อน เพราะมันเป็นส่วนเริ่มต้นของส่วนอื่นๆ ทั้งหมด หากไม่มี field ก็ทำอย่างอื่นต่อไม่ได้ ดังนั้นเริ่มต้นด้วยการสร้าง field ก่อน
@@ -291,11 +292,11 @@ function createField(row, column) {
 
 	return field;
 }
-function print(field) {
-	const rowLen = field.length;
 
-	for(let i = 0; i < rowLen; i++) {
-	   console.log(field[i]);
+function print(field) {
+
+	for( let row of field) {
+		console.log( row );
 	}
 }
 
@@ -334,6 +335,85 @@ console.log( getComponentFieldPerHole(3, 2) );
 
 ##### 2.3) เขียนให้อยู่ในรูปของ class
 
+```js
+const hat = "^";
+const hole = "O";
+const fieldCharacter = "░";
+const pathCharacter = "*";
+
+class Field {
+	#row = 0;
+	#column = 0;
+	#numFieldCharRatio = 3;
+	#numHoleRatio = 2;
+	#field = [];
+
+	constructor(row, column) {
+		this.#row = row > 0 ? +row : 8;
+		this.#column = column > 0 ? +column : 5;
+		this.#createField();
+		
+	}
+
+	#createField() {
+		const components = this.#getComponentFieldPerHole();
+		const comLen = components.length;
+		
+		for(let i = 0; i < this.#row; i++) {
+			this.#field.push([]);
+			for(let j = 0; j < this.#column; j++) {
+				this.#field[i].push( components[Math.floor( Math.random() * comLen )] );
+			}
+		}
+
+		// ส่วน random ของ "^"
+		const hatRow = Math.floor( Math.random() * this.#row );
+		const hatColumn = Math.floor( Math.random() * this.#column );
+		this.#field[ hatRow ][ hatColumn ] = hat;
+
+		// ส่วน random ของ "*"
+		let actorRow;
+		let actorColumn;
+		do {
+			actorRow = Math.floor( Math.random() * this.#row );
+			actorColumn = Math.floor( Math.random() * this.#column );
+		} while( actorRow === hatRow && actorColumn === hatColumn);
+		this.#field[ actorRow ][ actorColumn ] = pathCharacter;
+	}
+
+	#getComponentFieldPerHole() {
+		const components = [];
+		components.push( 
+			...(fieldCharacter.repeat(this.#numFieldCharRatio)), 
+			...(hole.repeat(this.#numHoleRatio))
+		);
+		return components;
+	}
+
+	print() {
+		// clear();
+		for( let row of this.#field) {
+			console.log( row );
+		}
+	}
+}
+
+const newGame = new Field();
+newGame.print();
+```
+- ได้ผลลัพธ์:
+```
+[ 'O', '*', '░', '░', '░' ]
+[ '░', 'O', '░', '░', 'O' ]
+[ '░', '░', '░', '░', '░' ]
+[ '░', 'O', 'O', 'O', '░' ]
+[ '░', '░', '░', '░', '░' ]
+[ 'O', 'O', 'O', 'O', '░' ]
+[ 'O', '░', 'O', '░', '░' ]
+[ '^', '░', '░', '░', 'O' ]
+```
+
+### 3) ทำให้เดินได้
 
 
 
