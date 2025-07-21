@@ -22,7 +22,7 @@ class Field {
 	y = 0;
 	xMax = 0;
 	yMax = 0;
-	warnBoundingField = false;
+	movingMessage = '';
 
 	constructor(row, column) {
 		this.row = row > 0 ? +row : 10;
@@ -76,34 +76,36 @@ class Field {
 		for( let row of this.field) {
 			console.log( row.join('') );
 		}
-		this.warnBoundingField ? console.log("You are in bounding field.") : null;
+		console.log(this.movingMessage);
+		this.movingMessage = '';
+		// this.movingMessage !== '' ? console.log(this.movingMessage) : null;
 	}
 
 	checkStep() {
 		this.warnBoundingField = false;
 
 		if (this.x < 0 || this.x > this.xMax || this.y < 0 || this.y > this.yMax) {
-			this.gameEnded("You moved outside.");
+			this.exitGame("You moved outside.");
 			return;
 		}
 		else if (this.field[this.y][this.x] === hole) {
-			this.gameEnded("You fell in a hole.");
+			this.exitGame("You fell in a hole.");
 			return;
 		}
 		else if (this.field[this.y][this.x] === hat) {
-			this.gameEnded("You found your hat.");
+			this.exitGame("You found your hat.");
 			return;
 		}
 		else if ( this.x === 0 || this.x === this.xMax || this.y === 0 || this.y === this.yMax) {
-			this.warnBoundingField = true;
+			this.movingMessage = 'You are in bounding field.';
 		}
 
 		this.updatePath();
 	}
 
-	gameEnded(message) {
-		this.gameActive = false;
+	exitGame(message) {
 		console.log(message);
+		this.gameActive = false;
 	}
 
 	updatePath() {
@@ -150,10 +152,10 @@ class Field {
 					this.checkStep();
 					break;
 				case 'q':
-					this.gameEnded("You exited the game.");
+					this.exitGame("You exited the game.");
 					break;
 				default:
-					console.log("Your input is invalid. Try again.");
+					this.movingMessage = "Your input is invalid. Try again.";
 			}
 		}
 	}
