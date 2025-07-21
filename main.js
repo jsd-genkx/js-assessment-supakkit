@@ -110,7 +110,7 @@ class Field {
 	}
 
 	updatePath() {
-		console.log(`y: ${this.y}, x: ${this.x}`);
+		// console.log(`y: ${this.y}, x: ${this.x}`);
 		this.field[this.y][this.x] = pathCharacter;
 	}
 
@@ -164,7 +164,6 @@ class Field {
 }
 
 const newGame = new Field();
-
 newGame.run();
 
 
