@@ -79,11 +79,9 @@ class Field {
 		}
 		console.log(this.movingMessage);
 		this.movingMessage = '';
-		// this.movingMessage !== '' ? console.log(this.movingMessage) : null;
 	}
 
 	checkStep() {
-		this.warnBoundingField = false;
 
 		if (this.x < 0 || this.x > this.xMax || this.y < 0 || this.y > this.yMax) {
 			this.exitGame("You went out of bounds! Game over.");
@@ -110,7 +108,6 @@ class Field {
 	}
 
 	updatePath() {
-		// console.log(`y: ${this.y}, x: ${this.x}`);
 		this.field[this.y][this.x] = pathCharacter;
 	}
 
