@@ -413,7 +413,116 @@ newGame.print();
 [ '^', '░', '░', '░', 'O' ]
 ```
 
-### 3) ทำให้เดินได้
+#### 3) สร้างเงื่อนไข หากเดินตกขอบ หรือตกหลุมให้ game over
+- ตอนนี้เรามี array ที่เก็บ field ที่เราต้องการแล้ว
+- ขั้นตอนต่อมา เราจะทำให้มันเดินได้
+- โดยหลักการทำงานของมันคือ
+	- เราเริ่มที่ตำแหน่งใดตำแหน่งหนึ่ง ซึ่งกำหนดแล้วจากการ random ในส่วนที่แล้ว
+	- เมื่อเดินไป 1 step ซึ่งจะให้มันไปเรียกใช้งาน methods การเดินมาใช้
+	- จากนั้น เราต้องเช็คว่า step ต่อไปที่เดิน
+		- ออกนอก field ถ้าใช่ -> game over 
+		- เป็น hole หรือเปล่า ถ้าใช่ -> game over
+		- หรือเป็น hat ถ้าใช่ -> win
+		- เป็นขอบ field หรือเปล่า ถ้าใช่ -> warning
+	- จากนั้น อัปเดทตำแหน่ง โดย replace `"*"` เข้าไปในตำแหน่งที่เดินไป
+	- แล้วแสดง field map ที่อัปเดทแล้วให้ user เห็น
+- โดยเริ่มจาก สร้าง method ที่ใช้เช็ค step ต่อไปที่เดินนี้ก่อน:
+```js
+checkStep() {
+	this.warnBoundingField = false;
+
+	if (this.x < 0 || this.x > this.xMax || this.y < 0 || this.y > this.yMax) {
+		this.gameEnded("You moved outside.");
+		return;
+	}
+	else if (this.field[this.y][this.x] === hole) {
+		this.gameEnded("You fell in a hole.");
+		return;
+	}
+	else if (this.field[this.y][this.x] === hat) {
+		this.gameEnded("You found your hat.");
+		return;
+	}
+	else if ( this.x === 0 || this.x === this.xMax || this.y === 0 || this.y === this.yMax) {
+		this.warnBoundingField = true;
+	}
+
+	this.updatePath();
+}
+
+gameEnded(message) {
+	this.gameActive = false;
+	console.log(message);
+}
+
+updatePath() {
+	console.log(`y: ${this.y}, x: ${this.x}`);
+	this.field[this.y][this.x] = pathCharacter;
+}
+```
+- จากนั้นสร้าง methods การเดินในทิศต่างๆ เพื่อใช้อัปเดทค่าตำแหน่งการเดิน:
+```js
+#moveRight() { 
+	this.#x++;
+}
+
+#moveLeft() { 
+	this.#x--;
+}
+
+#moveUp() { 
+	this.#y--;
+	}
+
+#moveDown() { 
+	this.#y++;
+}
+```
+- จากนั้นนำไปใส่ใน class หลัก โดยสร้างตัวแปรที่ต้องการใช้ทั้งหมดขึ้นมา และนำ `#x` และ `#y` ไปรับค่าตำแหน่งเริ่มต้น ที่ random ได้จากการสร้าง field
+
+#### 4) ทำให้เดินได้
+- สร้าง method ที่จะเรียกใช้งาน methods ในการเดินเหล่านี้:
+```js
+run() {
+	while(this.gameActive) {
+		this.print();
+		const direction = prompt("Which way? ");
+		
+		switch(direction) {
+			case 'a':
+				this.moveLeft();
+				this.checkStep();
+				break;
+			case 'd':
+				this.moveRight();
+				this.checkStep();
+				break;
+			case 'w':
+				this.moveUp();
+				this.checkStep();
+				break;
+			case 's':
+				this.moveDown();
+				this.checkStep();
+				break;
+			case 'q':
+				this.gameEnded("You exited the game.");
+				break;
+			default:
+				console.log("Your input is invalid. Try again.");
+		}
+	}
+}
+```
+
+#### 5) ปรับปรุงการแสดงผล
+- ปัจจุบันแสดงผลเป็นรูปแบบแถวของ array ทำให้มันดูเหมือนเกมมากขึ้นโดยการใช้ `arr.join()` เพื่อให้แต่ละ item ชิดกัน:
+```js
+for( let row of this.field) {
+	console.log( row.join('') );
+}
+```
+
 
 
 

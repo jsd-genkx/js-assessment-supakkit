@@ -12,114 +12,157 @@ const fieldCharacter = "░";
 const pathCharacter = "*";
 
 class Field {
-	#row = 0;
-	#column = 0;
-	#numFieldCharRatio = 3;
-	#numHoleRatio = 2;
-	#field = [];
+	row = 0;
+	column = 0;
+	numFieldCharRatio = 3;
+	numHoleRatio = 1;
+	field = [];
+	gameActive = true;
+	x = 0;
+	y = 0;
+	xMax = 0;
+	yMax = 0;
+	warnBoundingField = false;
 
 	constructor(row, column) {
-		this.#row = row > 0 ? +row : 8;
-		this.#column = column > 0 ? +column : 5;
-		this.#createField();
-		
+		this.row = row > 0 ? +row : 10;
+		this.column = column > 0 ? +column : 10;
+		this.yMax = this.row - 1;
+		this.xMax = this.column - 1;
+		this.createField();
 	}
 
-	#createField() {
-		const components = this.#getComponentFieldPerHole();
+	createField() {
+		const components = this.getComponentFieldPerHole();
 		const comLen = components.length;
 		
-		for(let i = 0; i < this.#row; i++) {
-			this.#field.push([]);
-			for(let j = 0; j < this.#column; j++) {
-				this.#field[i].push( components[Math.floor( Math.random() * comLen )] );
+		for(let i = 0; i < this.row; i++) {
+			this.field.push([]);
+			for(let j = 0; j < this.column; j++) {
+				this.field[i].push( components[Math.floor( Math.random() * comLen )] );
 			}
 		}
 
 		// ส่วน random ของ "^"
-		const hatRow = Math.floor( Math.random() * this.#row );
-		const hatColumn = Math.floor( Math.random() * this.#column );
-		this.#field[ hatRow ][ hatColumn ] = hat;
+		const hatRow = Math.floor( Math.random() * this.row );
+		const hatColumn = Math.floor( Math.random() * this.column );
+		this.field[ hatRow ][ hatColumn ] = hat;
 
 		// ส่วน random ของ "*"
 		let actorRow;
 		let actorColumn;
 		do {
-			actorRow = Math.floor( Math.random() * this.#row );
-			actorColumn = Math.floor( Math.random() * this.#column );
+			actorRow = Math.floor( Math.random() * this.row );
+			actorColumn = Math.floor( Math.random() * this.column );
 		} while( actorRow === hatRow && actorColumn === hatColumn);
-		this.#field[ actorRow ][ actorColumn ] = pathCharacter;
+		this.field[ actorRow ][ actorColumn ] = pathCharacter;
+
+		// ตำแหน่งเริ่มต้นในการเดินที่ได้จากการ random
+		this.y = actorRow;
+		this.x = actorColumn;
 	}
 
-	#getComponentFieldPerHole() {
+	getComponentFieldPerHole() {
 		const components = [];
 		components.push( 
-			...(fieldCharacter.repeat(this.#numFieldCharRatio)), 
-			...(hole.repeat(this.#numHoleRatio))
+			...(fieldCharacter.repeat(this.numFieldCharRatio)), 
+			...(hole.repeat(this.numHoleRatio))
 		);
 		return components;
 	}
 
 	print() {
-		// clear();
-		for( let row of this.#field) {
-			console.log( row );
+		clear();
+		for( let row of this.field) {
+			console.log( row.join('') );
+		}
+		this.warnBoundingField ? console.log("You are in bounding field.") : null;
+	}
+
+	checkStep() {
+		this.warnBoundingField = false;
+
+		if (this.x < 0 || this.x > this.xMax || this.y < 0 || this.y > this.yMax) {
+			this.gameEnded("You moved outside.");
+			return;
+		}
+		else if (this.field[this.y][this.x] === hole) {
+			this.gameEnded("You fell in a hole.");
+			return;
+		}
+		else if (this.field[this.y][this.x] === hat) {
+			this.gameEnded("You found your hat.");
+			return;
+		}
+		else if ( this.x === 0 || this.x === this.xMax || this.y === 0 || this.y === this.yMax) {
+			this.warnBoundingField = true;
+		}
+
+		this.updatePath();
+	}
+
+	gameEnded(message) {
+		this.gameActive = false;
+		console.log(message);
+	}
+
+	updatePath() {
+		console.log(`y: ${this.y}, x: ${this.x}`);
+		this.field[this.y][this.x] = pathCharacter;
+	}
+
+	moveRight() { 
+		this.x++;
+	}
+
+	moveLeft() { 
+		this.x--;
+	}
+
+	moveUp() { 
+		this.y--;
+	}
+
+	moveDown() { 
+		this.y++;
+	}
+
+	run() {
+		while(this.gameActive) {
+			this.print();
+			const direction = prompt("Which way? ");
+			
+			switch(direction) {
+				case 'a':
+					this.moveLeft();
+					this.checkStep();
+					break;
+				case 'd':
+					this.moveRight();
+					this.checkStep();
+					break;
+				case 'w':
+					this.moveUp();
+					this.checkStep();
+					break;
+				case 's':
+					this.moveDown();
+					this.checkStep();
+					break;
+				case 'q':
+					this.gameEnded("You exited the game.");
+					break;
+				default:
+					console.log("Your input is invalid. Try again.");
+			}
 		}
 	}
+
 }
 
 const newGame = new Field();
-newGame.print();
 
-/*
-function createField(row, column) {
-	const components = getComponentFieldPerHole(3, 1);
-	const comLen = components.length;
-	let field = [];
-	
-	for(let i = 0; i < row; i++) {
-		field.push([]);
-	    for(let j = 0; j < column; j++) {
-		    field[i].push( components[Math.floor( Math.random() * comLen )] );
-	   }
-	}
-	// ส่วน random ของ "^"
-	const hatRow = Math.floor( Math.random() * row );
-	const hatColumn = Math.floor( Math.random() * column );
-	field[ hatRow ][ hatColumn ] = "^";
+newGame.run();
 
-	// ส่วน random ของ "*"
-	let actorRow;
-	let actorColumn;
-	do {
-		actorRow = Math.floor( Math.random() * row );
-		actorColumn = Math.floor( Math.random() * column );
-	} while( actorRow === hatRow && actorColumn === hatColumn);
-	field[ actorRow ][ actorColumn ] = "*";
-
-	return field;
-}
-
-function getComponentFieldPerHole(numFieldChar, numHole) {
-	let components = [];
-	components.push( 
-		...("░".repeat(numFieldChar)), 
-		...("0".repeat(numHole))
-	);
-	return components;
-}
-
-function print(field) {
-
-	for( let row of field) {
-		console.log( row );
-	}
-}
-
-
-// testing
-print( createField(5, 3) );
-// console.log( getComponentFieldPerHole(3, 2) );
-*/
 
 
